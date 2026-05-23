@@ -13,7 +13,7 @@ import (
 var DB *gorm.DB
 
 func ConnectDB() {
-	if os.Getenv("VERCEL") != "" {
+	if os.Getenv("VERCEL") == "" {
 		_ = godotenv.Load()
 	}
 
