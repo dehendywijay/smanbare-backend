@@ -1,8 +1,9 @@
 package config
 
 import (
-	"fmt"
+	"log"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
@@ -12,27 +13,35 @@ import (
 var DB *gorm.DB
 
 func ConnectDB() {
-	if os.Getenv("VERCEL") == "" {
+	if os.Getenv("VERCEL") != "" {
 		_ = godotenv.Load()
 	}
 
 	dsn := os.Getenv("DATABASE_URL")
 	if dsn == "" {
-		fmt.Println("DATABASE_URL belum diset")
-		os.Exit(1)
+		log.Fatal("DATABASE_URL belum diset")
 	}
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  dsn,
-		PreferSimpleProtocol: true, 
+		PreferSimpleProtocol: true,
 	}), &gorm.Config{
 		PrepareStmt: false,
 	})
 	if err != nil {
-		fmt.Println("Gagal konek database:", err)
-		os.Exit(1)
+		log.Fatal("Gagal konek database:", err)
 	}
 
+	sqlDB, err := db.DB()
+	if err != nil {
+		log.Fatal("Gagal mengambil database instance:", err)
+	}
+
+	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetConnMaxLifetime(30 * time.Minute)
+
 	DB = db
-	fmt.Println("Database connected ✅")
+
+	log.Println("Database connected")
 }
