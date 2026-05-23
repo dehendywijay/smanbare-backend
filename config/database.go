@@ -17,9 +17,9 @@ func ConnectDB() {
 		_ = godotenv.Load()
 	}
 
-	dsn := os.Getenv("DATABASE_URL")
+	dsn := os.Getenv("DATABASE")
 	if dsn == "" {
-		log.Fatal("DATABASE_URL belum ")
+		log.Fatal("DATABASE_URL belum diset")
 	}
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
