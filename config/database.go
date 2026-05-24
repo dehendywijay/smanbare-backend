@@ -17,7 +17,7 @@ func ConnectDB() {
         _ = godotenv.Load()
     }
 
-    dsn := os.Getenv("DATABASE")
+    dsn := os.Getenv("DATABASE_URL")
     
     log.Println("VERCEL env:", os.Getenv("VERCEL"))
     log.Println("DSN kosong?", dsn == "")
