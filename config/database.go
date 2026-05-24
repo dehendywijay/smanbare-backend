@@ -23,7 +23,7 @@ func ConnectDB() {
     log.Println("DSN kosong?", dsn == "")
 
     if dsn == "" {
-        log.Fatal("DATABASE belum diset")
+        log.Println("DATABASE belum diset")
     }
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
