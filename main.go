@@ -12,10 +12,8 @@ import (
 )
 
 func main() {
-	if os.Getenv("VERCEL") == "" {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
+	gin.SetMode(gin.ReleaseMode)
+	
 	config.ConnectDB()
 
 	err := config.DB.AutoMigrate(

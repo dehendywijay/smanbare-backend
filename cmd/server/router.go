@@ -6,15 +6,12 @@ import (
 	"gin-app/models"
 	"gin-app/routes"
 	"log"
-	"os"
 
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRouter() *gin.Engine {
-	if os.Getenv("VERCEL") == "" {
-		gin.SetMode(gin.ReleaseMode)
-	}
+	gin.SetMode(gin.ReleaseMode)
 
 	config.ConnectDB()
 
