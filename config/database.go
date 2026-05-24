@@ -14,13 +14,17 @@ var DB *gorm.DB
 
 func ConnectDB() {
 	if os.Getenv("VERCEL") == "" {
-		_ = godotenv.Load()
-	}
+        _ = godotenv.Load()
+    }
 
-	dsn := os.Getenv("DATABASE")
-	if dsn == "" {
-		log.Fatal("DATABASE_URL belum diset")
-	}
+    dsn := os.Getenv("DATABASE")
+    
+    log.Println("VERCEL env:", os.Getenv("VERCEL"))
+    log.Println("DSN kosong?", dsn == "")
+
+    if dsn == "" {
+        log.Fatal("DATABASE belum diset")
+    }
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
 		DSN:                  dsn,
