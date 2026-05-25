@@ -3,9 +3,7 @@ package handler
 import (
 	"gin-app/config"
 	"gin-app/middleware"
-	"gin-app/models"
 	"gin-app/routes"
-	"log"
 	"net/http"
 	"sync"
 
@@ -22,18 +20,18 @@ func setupRouter() {
 
 	config.ConnectDB()
 
-	err := config.DB.AutoMigrate(
-		&models.News{},
-		&models.Admin{},
-		&models.Guru{},
-		&models.KepalaSekolah{},
-		&models.Eskul{},
-		&models.Alumni{},
-	)
+	// err := config.DB.AutoMigrate(
+	// 	&models.News{},
+	// 	&models.Admin{},
+	// 	&models.Guru{},
+	// 	&models.KepalaSekolah{},
+	// 	&models.Eskul{},
+	// 	&models.Alumni{},
+	// )
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	r := gin.New()
 

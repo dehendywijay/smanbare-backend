@@ -16,7 +16,7 @@ func ConnectDB() {
 	if os.Getenv("VERCEL") == "" {
         _ = godotenv.Load()
     }
-
+	start := time.Now()
     dsn := os.Getenv("DATABASE_URL")
     
     log.Println("VERCEL env:", os.Getenv("VERCEL"))
@@ -47,5 +47,5 @@ func ConnectDB() {
 
 	DB = db
 
-	log.Println("Database connected")
+	log.Println("Database connected", time.Since(start))
 }
