@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"gin-app/models"
 	"gin-app/services"
 	"gin-app/utility"
 	"net/http"
@@ -62,33 +61,6 @@ func LoginAdmin(c *gin.Context) {
 	})
 }
 
-func CreateAdmin(c *gin.Context) {
-	var adminInput models.Admin
-
-	if err := c.ShouldBindJSON(&adminInput); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
-		return
-	}
-
-	username := adminInput.Username
-	password := adminInput.Password
-
-	if username == "" || password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "username and password are required"})
-		return
-	}
-
-	admin, err := services.CreateAdmin(username, password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Admin berhasil dibuat",
-		"data":    admin,
-	})
-}
 
 func LogoutAdmin(c *gin.Context) {
 	c.SetCookie(

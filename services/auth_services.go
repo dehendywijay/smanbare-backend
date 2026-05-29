@@ -37,17 +37,3 @@ func LoginAdmin(username, password string) (dto.AdminDTO, error) {
 	}, nil
 }
 
-func CreateAdmin(username, password string) (dto.AdminDTO, error) {
-	hashedPassword, err := utility.HashPassword(password)
-	if err != nil {
-		return dto.AdminDTO{}, err
-	}
-
-	admin := models.Admin{
-		Username: username,
-		Password: hashedPassword,
-	}
-
-	err = config.DB.Create(&admin).Error
-	return dto.AdminDTO{Username: admin.Username}, err
-}

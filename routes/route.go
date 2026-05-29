@@ -33,7 +33,6 @@ func AuthRoute(r *gin.Engine) {
 	auth := r.Group("/api/auth")
 	{
 		auth.POST("/login", controllers.LoginAdmin)
-		auth.POST("/register", controllers.CreateAdmin)
 		auth.POST("/refresh", controllers.RefreshToken)
 	}
 	auth.Use(middleware.AuthMiddleware())
