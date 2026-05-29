@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"gin-app/config"
-	"gin-app/middleware"
-	"gin-app/routes"
+	"gin-app/internal/config"
+	"gin-app/internal/middleware"
+	"gin-app/internal/routes"
 	"net/http"
 	"sync"
 
@@ -39,11 +39,9 @@ func setupRouter() {
 	r.Use(gin.Recovery())
 	r.Use(middleware.CORSMiddleware())
 
-	routes.NewsRoute(r)
-	routes.AuthRoute(r)
-	routes.GuruRoute(r)
-	routes.EskulRoute(r)
-	routes.AlumniRoute(r)
+	app := config.BootstrapApp(config.DB)
+
+	routes.SetupRoutes(r, app)
 
 	router = r
 }
