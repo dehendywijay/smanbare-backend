@@ -1,7 +1,7 @@
-package api	
+package handler	
 
 import (
-	"gin-app/internal/config"
+	"gin-app/config"
 	"gin-app/internal/middleware"
 	"gin-app/internal/routes"
 	"net/http"
