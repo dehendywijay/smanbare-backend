@@ -2,7 +2,7 @@ package routes
 
 import (
 	"gin-app/config"
-	"gin-app/internal/middleware"
+	"gin-app/middleware"
 
 	"github.com/gin-gonic/gin"
 )

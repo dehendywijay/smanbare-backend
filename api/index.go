@@ -2,8 +2,8 @@ package handler
 
 import (
 	"gin-app/config"
-	"gin-app/internal/middleware"
-	"gin-app/internal/routes"
+	"gin-app/middleware"
+	"gin-app/routes"
 	"net/http"
 	"sync"
 
