@@ -1,4 +1,4 @@
-package handler
+package api	
 
 import (
 	"gin-app/internal/config"
