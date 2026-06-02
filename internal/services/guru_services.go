@@ -23,7 +23,7 @@ func NewGuruService(r *repository.GuruRepository) *GuruService {
 }
 
 func (s *GuruService) CreateGuru(guru dto.GuruRequest, c *gin.Context) error {
-	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, guru.Image)
+	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, guru.Foto)
 	if err != nil {
 		return fmt.Errorf("gagal memproses gambar : %s", err.Error())
 	}
@@ -57,7 +57,7 @@ func (s *GuruService) EditGuru(c *gin.Context, id string, updatedGuru dto.GuruRe
 		Jabatan: updatedGuru.Jabatan,
 	}
 
-	if updatedGuru.Image != nil {
+	if updatedGuru.Foto != nil {
 		oldObjectPath, err := s.r.GetFotoGuru(id)
 		if err != nil {
 			return fmt.Errorf("gagal mendapatkan foto lama: %s", err.Error())
@@ -65,7 +65,7 @@ func (s *GuruService) EditGuru(c *gin.Context, id string, updatedGuru dto.GuruRe
 
 		oldFoto := prosesimage.ExtractObjectPath(oldObjectPath, "guru")
 
-		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, updatedGuru.Image)
+		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, updatedGuru.Foto)
 		if err != nil {
 			return fmt.Errorf("gagal memproses gambar: %s", err.Error())
 		}
@@ -111,7 +111,7 @@ func (s *GuruService) EditKepala(id string, updatedKepalaSekolah dto.KepalaSekol
 		Name:    updatedKepalaSekolah.Name,
 		Content: updatedKepalaSekolah.Content,
 	}
-	if updatedKepalaSekolah.Image != nil {
+	if updatedKepalaSekolah.Foto != nil {
 		oldObjectPath, err := s.r.GetFotoKepala(id)
 		if err != nil {
 			return fmt.Errorf("gagal mendapatkan foto lama: %s", err.Error())
@@ -119,7 +119,7 @@ func (s *GuruService) EditKepala(id string, updatedKepalaSekolah dto.KepalaSekol
 
 		oldFoto := prosesimage.ExtractObjectPath(oldObjectPath, "kepala")
 
-		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, updatedKepalaSekolah.Image)
+		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, updatedKepalaSekolah.Foto)
 		if err != nil {
 			return fmt.Errorf("gagal memproses gambar: %s", err.Error())
 		}

@@ -23,7 +23,7 @@ func NewNewsService(r *repository.NewsRepository) *NewsService {
 }
 
 func (s *NewsService) CreateNews(data dto.NewsRequest, c *gin.Context) error {
-	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, data.Thumbnail)
+	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, data.Image)
 	if err != nil {
 		return fmt.Errorf("failed to process image upload: %w", err)
 	}
@@ -76,13 +76,13 @@ func (s *NewsService) UpdateNews(c *gin.Context, slug string, news dto.NewsReque
 	}
 
 	
-	if news.Thumbnail != nil {
+	if news.Image != nil {
 		oldObjectPath, err := s.r.GetFotoNews(slug)
 		if err != nil {
 			return fmt.Errorf("failed to get old image path: %w", err)
 		}
 
-		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, news.Thumbnail)
+		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, news.Image)
 		if err != nil {
 			return fmt.Errorf("failed to process image upload: %w", err)
 		}
