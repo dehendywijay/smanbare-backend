@@ -45,7 +45,7 @@ func (h *AuthControllers) LoginAdmin(c *gin.Context) {
 		7*24*60*60, // 7 hari
 		"/",
 		"",
-		false, // true kalau pakai HTTPS
+		true, // true kalau pakai HTTPS
 		true,  // HttpOnly
 	)
 
