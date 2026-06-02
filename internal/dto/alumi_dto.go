@@ -8,3 +8,10 @@ type AlumniCreateRequest struct {
 	Universitas string `form:"universitas" binding:"required"`
 	Tahun       string `form:"tahun" binding:"required"`
 }
+
+type AlumniEditRequest struct {
+	Nama        string `form:"nama" binding:"required"`
+	Foto        *multipart.FileHeader `form:"foto"`
+	Universitas string `form:"universitas" binding:"required"`
+	Tahun       string `form:"tahun" binding:"required"`
+}

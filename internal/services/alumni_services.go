@@ -51,7 +51,7 @@ func (s *AlumniServices) CreateAlumni(c *gin.Context, alumni *dto.AlumniCreateRe
 	return err
 }
 
-func (s *AlumniServices) UpdateAlumni(c *gin.Context, id string, alumni dto.AlumniCreateRequest, fileName string) error {
+func (s *AlumniServices) UpdateAlumni(c *gin.Context, id string, alumni dto.AlumniEditRequest, fileName string) error {
 	if alumni.Foto != nil {
 		oldObjectPath, err := s.r.GetFotoAlumni(id)
 		if err != nil {

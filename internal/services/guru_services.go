@@ -51,7 +51,7 @@ func (s *GuruService) GetGuru() ([]models.Guru, error) {
 	return s.r.GetGuru()
 }
 
-func (s *GuruService) EditGuru(c *gin.Context, id string, updatedGuru dto.GuruRequest) error {
+func (s *GuruService) EditGuru(c *gin.Context, id string, updatedGuru dto.EditGuruRequest) error {
 	guru := models.Guru{
 		Nama:    updatedGuru.Nama,
 		Jabatan: updatedGuru.Jabatan,

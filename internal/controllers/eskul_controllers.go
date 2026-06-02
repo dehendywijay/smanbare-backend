@@ -60,7 +60,7 @@ func (h *EskulControllers) GetEskulByID(c *gin.Context) {
 
 func (h *EskulControllers) EditEskul(c *gin.Context) {
 	id := c.Param("slug")
-	var eskul dto.CreateEskulRequest
+	var eskul dto.EditEskulRequest
 
 	if err := c.ShouldBind(&eskul); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

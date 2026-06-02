@@ -67,7 +67,7 @@ func (s *NewsService) GetNewsByID(slug string) (models.News, error) {
 	return result, err
 }
 
-func (s *NewsService) UpdateNews(c *gin.Context, slug string, news dto.NewsRequest) error {
+func (s *NewsService) UpdateNews(c *gin.Context, slug string, news dto.EditNewsRequest) error {
 	newsUpdated := models.News{
 		Title:    news.Title,
 		Content:  news.Content,

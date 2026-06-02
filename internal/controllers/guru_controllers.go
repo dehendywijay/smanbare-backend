@@ -53,7 +53,7 @@ func ( h *GuruControllers)GetGuru(c *gin.Context) {
 
 func (h *GuruControllers) EditGuru(c *gin.Context) {
 	id := c.Param("id")
-	var guru dto.GuruRequest
+	var guru dto.EditGuruRequest
 	if err := c.ShouldBind(&guru); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

@@ -67,7 +67,7 @@ func (s *EskulService) GetEskulByID(slug string) (models.Eskul, error) {
 	return data, nil
 }
 
-func (s *EskulService) EditEskul(slug string, updatedEskul dto.CreateEskulRequest, c *gin.Context)  error {
+func (s *EskulService) EditEskul(slug string, updatedEskul dto.EditEskulRequest, c *gin.Context)  error {
 	eskul := models.Eskul{
 		Nama:     updatedEskul.Nama,
 		Pembina:  updatedEskul.Pembina,

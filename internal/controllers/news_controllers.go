@@ -65,7 +65,7 @@ func (h *NewsControllers) GetNewsByID(c *gin.Context) {
 
 func (h *NewsControllers) UpdateNews(c *gin.Context) {
 	slug := c.Param("slug")
-	var news dto.NewsRequest
+	var news dto.EditNewsRequest
 	if err := c.ShouldBind(&news); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

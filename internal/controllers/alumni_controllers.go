@@ -47,7 +47,7 @@ func (h *AlumniControllers) CreateAlumni(c *gin.Context) {
 
 func (h *AlumniControllers) UpdateAlumni(c *gin.Context) {
 	id := c.Param("id")
-	var alumni dto.AlumniCreateRequest
+	var alumni dto.AlumniEditRequest
 	if err := c.ShouldBind(&alumni); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Data yang dimasukkan tidak sesuai: " + err.Error()})
 		return

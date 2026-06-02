@@ -13,3 +13,9 @@ type GuruRequest struct {
 	Jabatan  string `form:"jabatan" binding:"required"`
 	Foto     *multipart.FileHeader `form:"foto" binding:"required"`
 }
+
+type EditGuruRequest struct {
+	Nama     string `form:"nama" binding:"required"`
+	Jabatan  string `form:"jabatan" binding:"required"`
+	Foto     *multipart.FileHeader `form:"foto"`
+}
