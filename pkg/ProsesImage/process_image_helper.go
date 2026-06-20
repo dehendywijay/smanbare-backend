@@ -8,11 +8,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-func ProcessImageUpload(c *gin.Context, file *multipart.FileHeader) ([]byte, string, string, error) {
+func ProcessImageUpload( file *multipart.FileHeader) ([]byte, string, string, error) {
 	// file, err := c.FormFile(field)
 	// if err != nil {
 	// 	return nil, "", "", fmt.Errorf("gambar tidak boleh kosong")
