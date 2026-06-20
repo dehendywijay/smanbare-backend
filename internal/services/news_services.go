@@ -9,7 +9,6 @@ import (
 	"gin-app/pkg/slug"
 	"gin-app/pkg/storage"
 
-	"github.com/gin-gonic/gin"
 )
 
 type NewsService struct {
@@ -22,8 +21,8 @@ func NewNewsService(r *repository.NewsRepository) *NewsService {
 	}
 }
 
-func (s *NewsService) CreateNews(data dto.NewsRequest, c *gin.Context) error {
-	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, data.Image)
+func (s *NewsService) CreateNews(data dto.NewsRequest) error {
+	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(data.Image)
 	if err != nil {
 		return fmt.Errorf("failed to process image upload: %w", err)
 	}
@@ -67,7 +66,7 @@ func (s *NewsService) GetNewsByID(slug string) (models.News, error) {
 	return result, err
 }
 
-func (s *NewsService) UpdateNews(c *gin.Context, slug string, news dto.EditNewsRequest) error {
+func (s *NewsService) UpdateNews(slug string, news dto.EditNewsRequest) error {
 	newsUpdated := models.News{
 		Title:    news.Title,
 		Content:  news.Content,
@@ -82,7 +81,7 @@ func (s *NewsService) UpdateNews(c *gin.Context, slug string, news dto.EditNewsR
 			return fmt.Errorf("failed to get old image path: %w", err)
 		}
 
-		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, news.Image)
+		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(news.Image)
 		if err != nil {
 			return fmt.Errorf("failed to process image upload: %w", err)
 		}

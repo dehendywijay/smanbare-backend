@@ -8,7 +8,6 @@ import (
 	prosesimage "gin-app/pkg/ProsesImage"
 	"gin-app/pkg/storage"
 
-	"github.com/gin-gonic/gin"
 )
 
 type AlumniServices struct {
@@ -25,8 +24,8 @@ func (s *AlumniServices) GetAllAlumni() (*[]models.Alumni, error) {
 	return s.r.GetAllAlumni()
 }
 
-func (s *AlumniServices) CreateAlumni(c *gin.Context, alumni *dto.AlumniCreateRequest) error {
-	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, alumni.Foto)
+func (s *AlumniServices) CreateAlumni(alumni *dto.AlumniCreateRequest) error {
+	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload( alumni.Foto)
 	if err != nil {
 		return fmt.Errorf("Failed to process image: %w", err)
 	}
@@ -51,16 +50,21 @@ func (s *AlumniServices) CreateAlumni(c *gin.Context, alumni *dto.AlumniCreateRe
 	return err
 }
 
-func (s *AlumniServices) UpdateAlumni(c *gin.Context, id string, alumni dto.AlumniEditRequest, fileName string) error {
+func (s *AlumniServices) UpdateAlumni(id string, alumni dto.AlumniEditRequest) error {
+	alumnimodels := models.Alumni{
+		Nama:        alumni.Nama,
+		Universitas: alumni.Universitas,
+		Tahun:       alumni.Tahun,
+	}
 	if alumni.Foto != nil {
 		oldObjectPath, err := s.r.GetFotoAlumni(id)
 		if err != nil {
 			return fmt.Errorf("Gagal mengambil data foto lama: %w", err)
-		}
+		} 
 
 		oldFoto := prosesimage.ExtractObjectPath(oldObjectPath, "alumni")
 
-		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, alumni.Foto)
+		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(alumni.Foto)
 		if err != nil {
 			return fmt.Errorf("Gagal memproses gambar: %w", err)
 		}
@@ -69,17 +73,10 @@ func (s *AlumniServices) UpdateAlumni(c *gin.Context, id string, alumni dto.Alum
 		if err != nil {
 			return fmt.Errorf("Gagal mengupload file baru: %w", err)
 		}
-		fileName = publicURL
+		alumnimodels.Foto = publicURL
 	}
 
-	alumniModel := models.Alumni{
-		Nama:        alumni.Nama,
-		Foto:        fileName,
-		Universitas: alumni.Universitas,
-		Tahun:       alumni.Tahun,
-	}
-
-	err := s.r.UpdateAlumni(id, &alumniModel)
+	err := s.r.UpdateAlumni(id, &alumnimodels)
 	if err != nil {
 		return fmt.Errorf("Gagal memperbarui data alumni: %w", err)
 	}

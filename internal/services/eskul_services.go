@@ -9,7 +9,6 @@ import (
 
 	"fmt"
 
-	"github.com/gin-gonic/gin"
 )
 
 type EskulService struct {
@@ -22,8 +21,8 @@ func NewEskulService(r *repository.EskulRepository) *EskulService {
 	}
 }
 
-func (s *EskulService) CreateEskul(eskul dto.CreateEskulRequest, c *gin.Context) error {
-	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, eskul.Foto)
+func (s *EskulService) CreateEskul(eskul dto.CreateEskulRequest) error {
+	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(eskul.Foto)
 	if err != nil {
 		return fmt.Errorf("Gagal memproses gambar: %v", err)
 	}
@@ -67,7 +66,7 @@ func (s *EskulService) GetEskulByID(slug string) (models.Eskul, error) {
 	return data, nil
 }
 
-func (s *EskulService) EditEskul(slug string, updatedEskul dto.EditEskulRequest, c *gin.Context)  error {
+func (s *EskulService) EditEskul(slug string, updatedEskul dto.EditEskulRequest)  error {
 	eskul := models.Eskul{
 		Nama:     updatedEskul.Nama,
 		Pembina:  updatedEskul.Pembina,
@@ -85,7 +84,7 @@ func (s *EskulService) EditEskul(slug string, updatedEskul dto.EditEskulRequest,
 
 		oldFoto := prosesimage.ExtractObjectPath(oldObjectPath, "eskul")
 
-		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, updatedEskul.Foto)
+		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(updatedEskul.Foto)
 		if err != nil {
 			return fmt.Errorf("Gagal memproses gambar: %v", err)
 		}

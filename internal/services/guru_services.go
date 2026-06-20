@@ -9,7 +9,6 @@ import (
 	prosesimage "gin-app/pkg/ProsesImage"
 	"gin-app/pkg/storage"
 
-	"github.com/gin-gonic/gin"
 )
 
 type GuruService struct {
@@ -22,8 +21,8 @@ func NewGuruService(r *repository.GuruRepository) *GuruService {
 	}
 }
 
-func (s *GuruService) CreateGuru(guru dto.GuruRequest, c *gin.Context) error {
-	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, guru.Foto)
+func (s *GuruService) CreateGuru(guru dto.GuruRequest) error {
+	fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(guru.Foto)
 	if err != nil {
 		return fmt.Errorf("gagal memproses gambar : %s", err.Error())
 	}
@@ -51,7 +50,7 @@ func (s *GuruService) GetGuru() ([]models.Guru, error) {
 	return s.r.GetGuru()
 }
 
-func (s *GuruService) EditGuru(c *gin.Context, id string, updatedGuru dto.EditGuruRequest) error {
+func (s *GuruService) EditGuru( id string, updatedGuru dto.EditGuruRequest) error {
 	guru := models.Guru{
 		Nama:    updatedGuru.Nama,
 		Jabatan: updatedGuru.Jabatan,
@@ -65,7 +64,7 @@ func (s *GuruService) EditGuru(c *gin.Context, id string, updatedGuru dto.EditGu
 
 		oldFoto := prosesimage.ExtractObjectPath(oldObjectPath, "guru")
 
-		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, updatedGuru.Foto)
+		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(updatedGuru.Foto)
 		if err != nil {
 			return fmt.Errorf("gagal memproses gambar: %s", err.Error())
 		}
@@ -106,7 +105,7 @@ func (s *GuruService) DeleteGuru(id string) error {
 	return nil
 }
 
-func (s *GuruService) EditKepala(id string, updatedKepalaSekolah dto.KepalaSekolahRequest, c *gin.Context) error {
+func (s *GuruService) EditKepala(id string, updatedKepalaSekolah dto.KepalaSekolahRequest) error {
 	kepalaSekolah := models.KepalaSekolah{
 		Name:    updatedKepalaSekolah.Name,
 		Content: updatedKepalaSekolah.Content,
@@ -119,7 +118,7 @@ func (s *GuruService) EditKepala(id string, updatedKepalaSekolah dto.KepalaSekol
 
 		oldFoto := prosesimage.ExtractObjectPath(oldObjectPath, "kepala")
 
-		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(c, updatedKepalaSekolah.Foto)
+		fileBytes, objectPath, contentType, err := prosesimage.ProcessImageUpload(updatedKepalaSekolah.Foto)
 		if err != nil {
 			return fmt.Errorf("gagal memproses gambar: %s", err.Error())
 		}
