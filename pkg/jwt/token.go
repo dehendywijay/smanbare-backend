@@ -1,45 +1,44 @@
 package jwttoken
 
 import (
-	"os"
+	"crypto/rand"
+	"encoding/base64"
 	"time"
 
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt/v4"
 )
 
-func getAccessSecret() []byte {
-	secret := os.Getenv("ACCESS_SECRET_KEY")
-	if secret == "" {
-		return []byte("ACCESS_SECRET_KEY")
-	}
-	return []byte(secret)
+type JWTService struct {
+	SecretKey string
 }
 
-func getRefreshSecret() []byte {
-	secret := os.Getenv("REFRESH_SECRET_KEY")
-	if secret == "" {
-		return []byte("REFRESH_SECRET_KEY")
+func NewJWTService(secretKey string) *JWTService {
+	return &JWTService{
+		SecretKey: secretKey,
 	}
-	return []byte(secret)
-}
-func GenerateAccessToken(userID uint) (string, error) {
-	claims := jwt.MapClaims{
-		"user_id": userID,
-		"type":    "access",
-		"exp":     time.Now().Add(15 * time.Minute).Unix(),
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(getAccessSecret())
 }
 
-func GenerateRefreshToken(userID uint) (string, error) {
-	claims := jwt.MapClaims{
-		"user_id": userID,
-		"type":    "refresh",
-		"exp":     time.Now().Add(7 * 24 * time.Hour).Unix(),
+func (s *JWTService) GenerateAccessToken(userID uint) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"id":     userID,
+		"type":   "access",
+		"expire": time.Now().Add(time.Hour * 24 * 30).UnixMilli(),
+	})
+
+	jwtToken, err := token.SignedString([]byte(s.SecretKey))
+	if err != nil {
+		return "", err
+	}
+	return jwtToken, nil
+}
+
+func (s *JWTService) GenerateRefreshToken()(string, error) {
+	b := make([]byte, 32)
+
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(getRefreshSecret())
+	return base64.URLEncoding.EncodeToString(b), nil
 }
