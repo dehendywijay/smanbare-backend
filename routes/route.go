@@ -16,7 +16,7 @@ func SetupRoutes(r *gin.Engine, app *config.App) {
 		auth.POST("/refresh", app.AuthController.RefreshToken)
 	}
 
-	auth.Use(middleware.AuthMiddleware())
+	auth.Use(middleware.AuthMiddleware(app.Config.JWTAccessSecret))
 	{
 		auth.POST("/logout", app.AuthController.LogoutAdmin)
 	}
@@ -29,14 +29,13 @@ func SetupRoutes(r *gin.Engine, app *config.App) {
 		news.GET("/:slug", app.NewsController.GetNewsByID)
 	}
 
-	news.Use(middleware.AuthMiddleware())
+	news.Use(middleware.AuthMiddleware(app.Config.JWTAccessSecret))
 	{
 		news.POST("", app.NewsController.CreateNews)
 		news.PUT("/:slug", app.NewsController.UpdateNews)
 		news.DELETE("/:slug", app.NewsController.DeleteNews)
 	}
 
-	
 	// GURU
 	guru := r.Group("/api/guru")
 	{
@@ -44,7 +43,7 @@ func SetupRoutes(r *gin.Engine, app *config.App) {
 		guru.GET("/kepala/:id", app.GuruController.GetKepalaByID)
 	}
 
-	guru.Use(middleware.AuthMiddleware())
+	guru.Use(middleware.AuthMiddleware(app.Config.JWTAccessSecret))
 	{
 		guru.POST("", app.GuruController.CreateGuru)
 		guru.PUT("/:id", app.GuruController.EditGuru)
@@ -60,7 +59,7 @@ func SetupRoutes(r *gin.Engine, app *config.App) {
 		eskul.GET("/:slug", app.EskulController.GetEskulByID)
 	}
 
-	eskul.Use(middleware.AuthMiddleware())
+	eskul.Use(middleware.AuthMiddleware(app.Config.JWTAccessSecret))
 	{
 		eskul.POST("", app.EskulController.CreateEskul)
 		eskul.PUT("/:slug", app.EskulController.EditEskul)
@@ -73,7 +72,7 @@ func SetupRoutes(r *gin.Engine, app *config.App) {
 		alumni.GET("", app.AlumniController.GetAllAlumni)
 	}
 
-	alumni.Use(middleware.AuthMiddleware())
+	alumni.Use(middleware.AuthMiddleware(app.Config.JWTAccessSecret))
 	{
 		alumni.PUT("/:id", app.AlumniController.UpdateAlumni)
 		alumni.DELETE("/:id", app.AlumniController.DeleteAlumni)
