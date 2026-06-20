@@ -1,9 +1,10 @@
-package handler	
+package handler
 
 import (
 	"gin-app/config"
 	"gin-app/middleware"
 	"gin-app/routes"
+	"log"
 	"net/http"
 	"sync"
 
@@ -18,20 +19,17 @@ var (
 func setupRouter() {
 	gin.SetMode(gin.ReleaseMode)
 
-	config.ConnectDB()
+	cfg := config.LoadConfig()
 
-	// err := config.DB.AutoMigrate(
-	// 	&models.News{},
-	// 	&models.Admin{},
-	// 	&models.Guru{},
-	// 	&models.KepalaSekolah{},
-	// 	&models.Eskul{},
-	// 	&models.Alumni{},
-	// )
+	db, err := config.ConnectDB(cfg)
+	if err != nil {
+		log.Fatal("Gagal konek ke database:", err)
+	}
 
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	redis, err := config.RedisConnect(cfg)
+	if err != nil {
+		log.Fatal("Gagal konek ke Redis:", err)
+	}
 
 	r := gin.New()
 
@@ -39,7 +37,7 @@ func setupRouter() {
 	r.Use(gin.Recovery())
 	r.Use(middleware.CORSMiddleware())
 
-	app := config.BootstrapApp(config.DB)
+	app := config.BootstrapApp(db, cfg, redis)
 
 	routes.SetupRoutes(r, app)
 
