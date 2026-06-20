@@ -4,7 +4,10 @@ import (
 	"gin-app/internal/controllers"
 	"gin-app/internal/repository"
 	"gin-app/internal/services"
+	"gin-app/internal/validator"
+	jwttoken "gin-app/pkg/jwt"
 
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
@@ -14,29 +17,32 @@ type App struct {
 	EskulController  *controllers.EskulControllers
 	GuruController   *controllers.GuruControllers
 	NewsController   *controllers.NewsControllers
+	Config           *Config
 }
 
-func BootstrapApp(db *gorm.DB) *App {
+func BootstrapApp(db *gorm.DB, cfg *Config, redis *redis.Client) *App {
+	validator := validator.NewCustomValidator()
+	token := jwttoken.NewJWTService(cfg.JWTAccessSecret)
 
 	authRepo := repository.NewAuthRepository(db)
-	authService := services.NewAuthService(authRepo)
-	authController := controllers.NewAuthControllers(authService)
-
 	alumniRepo := repository.NewAlumniRepository(db)
-	alumniService := services.NewAlumniService(alumniRepo)
-	alumniController := controllers.NewAlumniControllers(alumniService)
-
 	eskulRepo := repository.NewEskulRepository(db)
-	eskulService := services.NewEskulService(eskulRepo)
-	eskulController := controllers.NewEskulControllers(eskulService)
-
 	guruRepo := repository.NewGuruRepository(db)
-	guruService := services.NewGuruService(guruRepo)
-	guruController := controllers.NewGuruControllers(guruService)
-
 	newsRepo := repository.NewNewsRepository(db)
+	tokenRepo := repository.NewTokenRepository(redis)
+
+
+	authService := services.NewAuthService(authRepo, token, tokenRepo)
+	alumniService := services.NewAlumniService(alumniRepo)
+	eskulService := services.NewEskulService(eskulRepo)
+	guruService := services.NewGuruService(guruRepo)
 	newsService := services.NewNewsService(newsRepo)
-	newsController := controllers.NewNewsControllers(newsService)
+
+	authController := controllers.NewAuthControllers(authService, validator, tokenRepo)
+	alumniController := controllers.NewAlumniControllers(alumniService, validator)
+	eskulController := controllers.NewEskulControllers(eskulService, validator)
+	guruController := controllers.NewGuruControllers(guruService, validator)
+	newsController := controllers.NewNewsControllers(newsService, validator)
 
 	return &App{
 		AuthController:   authController,
@@ -44,5 +50,6 @@ func BootstrapApp(db *gorm.DB) *App {
 		EskulController:  eskulController,
 		GuruController:   guruController,
 		NewsController:   newsController,
+		Config:           cfg,
 	}
 }
