@@ -3,18 +3,21 @@ package controllers
 import (
 	"gin-app/internal/dto"
 	"gin-app/internal/services"
+	"gin-app/internal/validator"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type GuruControllers struct {
-	s *services.GuruService
+	s         *services.GuruService
+	Validator validator.CustomValidator
 }
 
-func NewGuruControllers(s *services.GuruService) *GuruControllers {
+func NewGuruControllers(s *services.GuruService, validator validator.CustomValidator) *GuruControllers {
 	return &GuruControllers{
-		s: s,
+		s:         s,
+		Validator: validator,
 	}
 }
 
@@ -25,12 +28,13 @@ func (h *GuruControllers) CreateGuru(c *gin.Context) {
 		return
 	}
 
-	if guru.Nama == "" || guru.Jabatan == ""  {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Semua Fieldperlu di isi"})
+	err := h.Validator.Validate(&guru)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.s.CreateGuru(guru, c)
+	err = h.s.CreateGuru(guru)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -41,7 +45,7 @@ func (h *GuruControllers) CreateGuru(c *gin.Context) {
 	})
 }
 
-func ( h *GuruControllers)GetGuru(c *gin.Context) {
+func (h *GuruControllers) GetGuru(c *gin.Context) {
 	guru, err := h.s.GetGuru()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -59,12 +63,13 @@ func (h *GuruControllers) EditGuru(c *gin.Context) {
 		return
 	}
 
-	if guru.Nama == "" || guru.Jabatan == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "nama and jabatan are required"})
+	err := h.Validator.Validate(&guru)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.s.EditGuru(c, id, guru)
+	err = h.s.EditGuru(id, guru)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -102,7 +107,7 @@ func (h *GuruControllers) EditKepala(c *gin.Context) {
 		return
 	}
 
-	err := h.s.EditKepala(id, kepalaSekolah, c)
+	err := h.s.EditKepala(id, kepalaSekolah)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat data kepala sekolah "})
 		return

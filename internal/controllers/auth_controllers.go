@@ -1,21 +1,27 @@
 package controllers
 
 import (
+	"fmt"
 	"gin-app/internal/dto"
+	"gin-app/internal/repository"
 	"gin-app/internal/services"
+	"gin-app/internal/validator"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-
 type AuthControllers struct {
-	s *services.AuthService
+	s         *services.AuthService
+	Validator validator.CustomValidator
+	R         *repository.TokenRepository
 }
 
-func NewAuthControllers(s *services.AuthService) *AuthControllers {
+func NewAuthControllers(s *services.AuthService, validator validator.CustomValidator, r *repository.TokenRepository) *AuthControllers {
 	return &AuthControllers{
-		s: s,
+		s:         s,
+		Validator: validator,
+		R:         r,
 	}
 }
 
@@ -27,9 +33,9 @@ func (h *AuthControllers) LoginAdmin(c *gin.Context) {
 		return
 	}
 
-
-	if loginRequest.Username == "" || loginRequest.Password == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "username and password are required"})
+	err := h.Validator.Validate(&loginRequest)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -45,8 +51,8 @@ func (h *AuthControllers) LoginAdmin(c *gin.Context) {
 		7*24*60*60, // 7 hari
 		"/",
 		"",
-		true, // true kalau pakai HTTPS
-		true,  // HttpOnly
+		false,
+		true, // HttpOnly
 	)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -58,8 +64,19 @@ func (h *AuthControllers) LoginAdmin(c *gin.Context) {
 	})
 }
 
-
 func (h *AuthControllers) LogoutAdmin(c *gin.Context) {
+	refreshToken, err := c.Cookie("refresh_token")
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "refresh token not found"})
+		return
+	}
+
+	err = h.R.DeleteToken(refreshToken)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete refresh token"})
+		return
+	}
+
 	c.SetCookie(
 		"refresh_token",
 		"",
@@ -77,9 +94,17 @@ func (h *AuthControllers) LogoutAdmin(c *gin.Context) {
 
 func (h *AuthControllers) RefreshToken(c *gin.Context) {
 	refreshToken, err := c.Cookie("refresh_token")
-	
+
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "refresh token tidak ditemukan",
+		})
+		return
+	}
+
 	result, err := h.s.RefreshToken(refreshToken)
 	if err != nil {
+		fmt.Println("REFRESH TOKEN ERROR :", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "refresh token tidak valid"})
 		return
 	}
@@ -88,3 +113,5 @@ func (h *AuthControllers) RefreshToken(c *gin.Context) {
 		"access_token": result,
 	})
 }
+
+

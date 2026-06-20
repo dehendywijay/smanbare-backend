@@ -3,18 +3,21 @@ package controllers
 import (
 	"gin-app/internal/dto"
 	"gin-app/internal/services"
+	"gin-app/internal/validator"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
 type NewsControllers struct {
-	s *services.NewsService
+	s         *services.NewsService
+	Validator validator.CustomValidator
 }
 
-func NewNewsControllers(s *services.NewsService) *NewsControllers {
+func NewNewsControllers(s *services.NewsService, validator validator.CustomValidator) *NewsControllers {
 	return &NewsControllers{
-		s: s,
+		s:         s,
+		Validator: validator,
 	}
 }
 
@@ -25,12 +28,13 @@ func (h *NewsControllers) CreateNews(c *gin.Context) {
 		return
 	}
 
-	if news.Title == "" || news.Content == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "title and content are required"})
+	err := h.Validator.Validate(&news)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.s.CreateNews(news, c)
+	err = h.s.CreateNews(news)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -70,14 +74,13 @@ func (h *NewsControllers) UpdateNews(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	if news.Title == "" || news.Content == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "title and content are required"})
+	err := h.Validator.Validate(&news)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-
-	err := h.s.UpdateNews(c, slug, news)
+	err = h.s.UpdateNews(slug, news)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

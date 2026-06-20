@@ -3,6 +3,7 @@ package controllers
 import (
 	"gin-app/internal/dto"
 	"gin-app/internal/services"
+	"gin-app/internal/validator"
 
 	"net/http"
 
@@ -11,11 +12,13 @@ import (
 
 type AlumniControllers struct {
 	s *services.AlumniServices
+	Validator validator.CustomValidator
 }
 
-func NewAlumniControllers(s *services.AlumniServices) *AlumniControllers {
+func NewAlumniControllers(s *services.AlumniServices, validator validator.CustomValidator) *AlumniControllers {
 	return &AlumniControllers{
 		s: s,
+		Validator: validator,
 	}
 }
 
@@ -36,7 +39,13 @@ func (h *AlumniControllers) CreateAlumni(c *gin.Context) {
 		return
 	}
 
-	err := h.s.CreateAlumni(c, &alumni)
+	err := h.Validator.Validate(&alumni)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = h.s.CreateAlumni(&alumni)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membuat data alumni: " + err.Error()})
 		return
@@ -53,14 +62,13 @@ func (h *AlumniControllers) UpdateAlumni(c *gin.Context) {
 		return
 	}
 
-	file := alumni.Foto
-	fileName := file.Filename
-	if fileName == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Foto tidak boleh kosong"})
+	err := h.Validator.Validate(&alumni)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err := h.s.UpdateAlumni(c, id, alumni, fileName)
+	err = h.s.UpdateAlumni(id, alumni)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memperbarui data alumni: " + err.Error()})
 		return

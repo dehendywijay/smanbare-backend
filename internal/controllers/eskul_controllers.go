@@ -3,6 +3,7 @@ package controllers
 import (
 	"gin-app/internal/dto"
 	"gin-app/internal/services"
+	"gin-app/internal/validator"
 	"gin-app/pkg/slug"
 	"net/http"
 
@@ -10,12 +11,14 @@ import (
 )
 
 type EskulControllers struct {
-	s *services.EskulService
+	s         *services.EskulService
+	Validator validator.CustomValidator
 }
 
-func NewEskulControllers(s *services.EskulService) *EskulControllers {
+func NewEskulControllers(s *services.EskulService, validator validator.CustomValidator) *EskulControllers {
 	return &EskulControllers{
-		s: s,
+		s:         s,
+		Validator: validator,
 	}
 }
 
@@ -27,9 +30,15 @@ func (h *EskulControllers) CreateEskul(c *gin.Context) {
 		return
 	}
 
+	err := h.Validator.Validate(&eskul)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	eskul.Slug = slug.MakeSlug(eskul.Nama)
 
-	err := h.s.CreateEskul(eskul, c)
+	err = h.s.CreateEskul(eskul)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -67,9 +76,15 @@ func (h *EskulControllers) EditEskul(c *gin.Context) {
 		return
 	}
 
+	err := h.Validator.Validate(&eskul)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	eskul.Slug = slug.MakeSlug(eskul.Nama)
 
-	err := h.s.EditEskul(id, eskul, c)
+	err = h.s.EditEskul(id, eskul)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
