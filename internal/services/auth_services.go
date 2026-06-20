@@ -3,35 +3,28 @@ package services
 import (
 	"fmt"
 	"gin-app/internal/dto"
-	"gin-app/internal/models"
 	"gin-app/internal/repository"
 	"gin-app/pkg/hash"
 	jwttoken "gin-app/pkg/jwt"
-	"os"
 
-	"github.com/golang-jwt/jwt/v4"
 )
-
-func getRefreshSecret() []byte {
-	secret := os.Getenv("REFRESH_SECRET_KEY")
-	if secret == "" {
-		return []byte("REFRESH_SECRET_KEY")
-	}
-	return []byte(secret)
-}
 
 type AuthService struct {
 	r *repository.AuthRepository
+	RepoToken *repository.TokenRepository
+	Token *jwttoken.JWTService
+
 }
 
-func NewAuthService(r *repository.AuthRepository) *AuthService {
+func NewAuthService(r *repository.AuthRepository, token *jwttoken.JWTService, repoToken *repository.TokenRepository) *AuthService {
 	return &AuthService{
 		r: r,
+		Token: token,
+		RepoToken: repoToken,
 	}
 }
 
 func (s *AuthService) LoginAdmin(username, password string) (dto.AdminDTO, error) {
-	var admin models.Admin
 
 	admin, err := s.r.LoginAdmin(username, password)
 	if err != nil {
@@ -42,12 +35,17 @@ func (s *AuthService) LoginAdmin(username, password string) (dto.AdminDTO, error
 		return dto.AdminDTO{}, fmt.Errorf("gagal login: password salah")
 	}
 
-	accessToken, err := jwttoken.GenerateAccessToken(admin.ID)
+	accessToken, err := s.Token.GenerateAccessToken(1)
 	if err != nil {
 		return dto.AdminDTO{}, err
 	}
 
-	refreshToken, err := jwttoken.GenerateRefreshToken(admin.ID)
+	refreshToken, err := s.Token.GenerateRefreshToken()
+	if err != nil {
+		return dto.AdminDTO{}, err
+	}
+
+	err = s.RepoToken.SetToken(refreshToken)
 	if err != nil {
 		return dto.AdminDTO{}, err
 	}
@@ -60,23 +58,12 @@ func (s *AuthService) LoginAdmin(username, password string) (dto.AdminDTO, error
 }
 
 func (s *AuthService) RefreshToken(refreshToken string) (string, error) {
-	token, err := jwt.Parse(refreshToken, func(token *jwt.Token) (interface{}, error) {
-		return getRefreshSecret(), nil
-	})
-
-	if err != nil || !token.Valid {
-		return "", fmt.Errorf("refresh token tidak valid")
+	_, err := s.RepoToken.GetToken(refreshToken)
+	if err != nil {
+		return "", err
 	}
 
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || claims["type"] != "refresh" {
-		return "", fmt.Errorf("refresh token tidak valid")
-	}
-
-	userIDFloat := claims["user_id"].(float64)
-	userID := uint(userIDFloat)
-
-	newAccessToken, err := jwttoken.GenerateAccessToken(userID)
+	newAccessToken, err := s.Token.GenerateAccessToken(1)
 	if err != nil {
 		return "", fmt.Errorf("gagal membuat access token baru")
 	}
