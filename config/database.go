@@ -2,25 +2,16 @@ package config
 
 import (
 	"log"
-	"os"
 	"time"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
-var DB *gorm.DB
 
-func ConnectDB() {
-	if os.Getenv("VERCEL") == "" {
-        _ = godotenv.Load()
-    }
+func ConnectDB(cfg *Config) (*gorm.DB, error) {
 	start := time.Now()
-    dsn := os.Getenv("DATABASE_URL")
-    
-    log.Println("VERCEL env:", os.Getenv("VERCEL"))
-    log.Println("DSN kosong?", dsn == "")
+    dsn := cfg.DATABASE_URL
 
     if dsn == "" {
         log.Println("DATABASE belum diset")
@@ -33,7 +24,7 @@ func ConnectDB() {
 		PrepareStmt: false,
 	})
 	if err != nil {
-		log.Fatal("Gagal konek database:", err)
+		log.Fatal("Gagal konek database:", err, "ss", dsn)
 	}
 
 	sqlDB, err := db.DB()
@@ -45,7 +36,7 @@ func ConnectDB() {
 	sqlDB.SetMaxOpenConns(25)
 	sqlDB.SetConnMaxLifetime(30 * time.Minute)
 
-	DB = db
-
 	log.Println("Database connected", time.Since(start))
+
+	return db, nil
 }
