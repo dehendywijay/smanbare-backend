@@ -45,15 +45,15 @@ func (h *AuthControllers) LoginAdmin(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie(
-		"refresh_token",
-		admin.RefreshToken,
-		1*24*60*60, 
-		"/",
-		"",
-		true,
-		true, 
-	)
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:     "refresh_token",
+		Value:    admin.RefreshToken,
+		Path:     "/",
+		MaxAge:   7 * 24 * 60 * 60,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteNoneMode,
+	})
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Login successful",
@@ -113,5 +113,3 @@ func (h *AuthControllers) RefreshToken(c *gin.Context) {
 		"access_token": result,
 	})
 }
-
-
