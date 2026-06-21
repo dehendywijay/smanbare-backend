@@ -48,11 +48,11 @@ func (h *AuthControllers) LoginAdmin(c *gin.Context) {
 	c.SetCookie(
 		"refresh_token",
 		admin.RefreshToken,
-		7*24*60*60, // 7 hari
+		1*24*60*60, 
 		"/",
 		"",
-		false,
-		true, // HttpOnly
+		true,
+		true, 
 	)
 
 	c.JSON(http.StatusOK, gin.H{
@@ -83,7 +83,7 @@ func (h *AuthControllers) LogoutAdmin(c *gin.Context) {
 		-1,
 		"/",
 		"",
-		false,
+		true,
 		true,
 	)
 
